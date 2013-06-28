@@ -14,6 +14,7 @@ import hudson.triggers.TimerTrigger;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import hudson.util.FormValidation;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,14 +23,19 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
 import javax.servlet.ServletException;
+
 import net.sf.json.JSONObject;
+
 import org.kohsuke.github.GHAuthorization;
 import org.kohsuke.github.GHCommitState;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+
+import com.coravy.hudson.plugins.github.GithubProjectProperty;
 
 /**
  * @author Honza Brázdil <jbrazdil@redhat.com>
@@ -60,6 +66,10 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 
 	@Override
 	public void start(AbstractProject<?, ?> project, boolean newInstance) {
+		if (project.getProperty(GithubProjectProperty.class) == null) {
+			logger.log(Level.INFO, "GitHub project not set up, cannot start trigger for job " + project.getName());
+			return;
+		}
 		try{
 			ml = Ghprb.getBuilder()
 			     .setProject(project)
@@ -116,6 +126,7 @@ public final class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
 
 	@Override
 	public void run() {
+		if (ml == null) return;
 		ml.run();
 		DESCRIPTOR.save();
 	}

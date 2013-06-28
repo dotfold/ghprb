@@ -4,9 +4,11 @@ import hudson.model.AbstractBuild;
 import hudson.model.Cause;
 import hudson.model.Result;
 import hudson.model.queue.QueueTaskFuture;
+
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.kohsuke.github.GHCommitState;
 
 /**
@@ -67,6 +69,9 @@ public class GhprbBuilds {
 
 	public void onCompleted(AbstractBuild build) {
 		GhprbCause c = getCause(build);
+		
+		logger.log(Level.INFO, "Pull request builder: cause:{0} - posting back status...", new Object[]{c});
+		
 		if(c == null) return;
 
 		GHCommitState state;

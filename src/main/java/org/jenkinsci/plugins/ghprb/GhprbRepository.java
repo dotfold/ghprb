@@ -163,6 +163,11 @@ public class GhprbRepository {
 	}
 
 	public boolean createHook(){
+		if (repo == null) {
+			logger.log(Level.INFO, "Repository not available, cannot set pull request hook for repository " +
+					reponame);
+			return false;
+		}
 		try{
 			if(hookExist()) return true;
 			repo.createWebHook(new URL(ml.getHookUrl()),EVENTS);
